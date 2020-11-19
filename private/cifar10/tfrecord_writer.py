@@ -54,13 +54,18 @@ def _parse_function(example_proto):
     return tf.io.parse_single_example(example_proto, feature_description)
 
 
-for example in train.take(1):
-    parsed_example = _parse_function(serialize_example(example))
-    print(parsed_example['id'])
-    print(tf.io.parse_tensor(parsed_example['image'], out_type=tf.uint8))
-    print(parsed_example['label'])
-    print(parsed_example)
+# for example in train.take(1):
+#     parsed_example = _parse_function(serialize_example(example))
+#     print(parsed_example['id'])
+#     print(tf.io.parse_tensor(parsed_example['image'], out_type=tf.uint8))
+#     print(parsed_example['label'])
+#     print(parsed_example)
 
-# train_tfrecord = "train.tfrecord"
-# with tf.io.TFRecordWriter(train_tfrecord) as writer:
-#     for example in train:
+train_tfrecord_filename_template = "../data/cifar10_tfrecords/train/train-%s"
+
+# Write Cifar10 dataset and repeat 10 times to get several TFRecord files
+for epoch in range(10):
+    filename = train_tfrecord_filename_template % epoch
+    with tf.io.TFRecordWriter(filename) as writer:
+        for example in train:
+            writer.write(serialize_example(example))

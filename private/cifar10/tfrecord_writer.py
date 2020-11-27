@@ -1,5 +1,3 @@
-import os
-
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
@@ -36,8 +34,8 @@ def serialize_example(example):
     return example_proto.SerializeToString()
 
 
-os.putenv("http_proxy", "http://172.17.0.1:10809")
-os.putenv("https_proxy", "http://172.17.0.1:10809")
+# os.putenv("http_proxy", "http://172.17.0.1:10809")
+# os.putenv("https_proxy", "http://172.17.0.1:10809")
 
 ds = tfds.load('cifar10', shuffle_files=True, data_dir="../data")
 train = ds['train']
@@ -61,11 +59,12 @@ def _parse_function(example_proto):
 #     print(parsed_example['label'])
 #     print(parsed_example)
 
-train_tfrecord_filename_template = "../data/cifar10_tfrecords/train/train-%s"
+train_tfrecord_filename_template = "../data/cifar10_tfrecords_5g/train/train-%s"
 
 # Write Cifar10 dataset and repeat 10 times to get several TFRecord files
-for epoch in range(10):
+for epoch in range(50):
     filename = train_tfrecord_filename_template % epoch
+    print("Writing tfrecord file %s..." % filename)
     with tf.io.TFRecordWriter(filename) as writer:
         for example in train:
             writer.write(serialize_example(example))

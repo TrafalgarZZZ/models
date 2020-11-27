@@ -1,12 +1,14 @@
 import tensorflow as tf
+import tfrecord_preprocessor as preprocess
 from tensorflow.keras import models, layers
-
-import private.cifar10.tfrecord_preprocessor as preprocess
 
 # Read data from tfrecord and preprocess each example
 # filenames = ['train.tfrecord']
-tfrecord_pattern = "../data/cifar10_tfrecords/train/*"
-filenames = tf.data.Dataset.list_files(tfrecord_pattern, shuffle=True)
+tfrecord_pattern = "/data/cifar10/train/*"
+filenames = tf.data.Dataset.list_files(tfrecord_pattern, shuffle=True).cache()
+print(list(iter(filenames)))
+# filenames = ['../data/cifar10_tfrecords/train/train-1', '../data/cifar10_tfrecords/train/train-2']
+# filenames = tf.data.Dataset.from_tensor_slices(filenames)
 for filename in filenames:
     print(filename)
 train_ds = preprocess.get_dataset_from_tfrecord(filenames=filenames).shuffle(1024).batch(32)
@@ -48,7 +50,7 @@ model.add(layers.Dense(10))
 
 model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
-model.fit(train_ds, epochs=1)
+model.fit(train_ds, epochs=5)
 
 # for x, y in x_train, y_train:
 #     predictions = model(x)
